@@ -137,8 +137,7 @@
     webhookUrl,
     message // Assuming `message` is the text you want to send to Slack
   }),
-       mode: 'cors',  // This indicates you're making a CORS request
-  credentials: 'same-origin'  // Optional, only if you need credentials (cookies, etc.)
+       mode: 'cors'
 });
 
       if (response.ok) {
