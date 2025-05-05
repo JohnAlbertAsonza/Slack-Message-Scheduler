@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slack Message Scheduler</title>
+  <style>
+    body{
+      overflow-x: scroll;
+          position: relative;
+          height: 90vh;
+        float: left;
+      font-family: 'Poppins', sans-serif;
+      vertical-align: top;
+      background-color: #1f1f1f;
+      color: #ebedef;
+      
+    }
+    
+    label {
+      display: block;
+      margin-top: 20px;
+      width: 1000px;
+    }
+    input, select, button {
+      width: 1000px;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+    select,button {
+      width: 1025px;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+    button:disabled {
+      background-color: #ccc;
+    }
+    form{
+      margin-top: 10px!important;
+      margin: 120px;
+    }
+
+    @media screen and (max-width: 1023px) {
+    form{
+      margin: 15px;
+      width: 90%;
+    }
+    label {
+      display: block;
+      
+      width: 100%;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+
+    
+    }
+  </style>
+</head>
+<body>
+  <form>
+  <h1>Slack Message Scheduler</h1>
+
+  <label>
+    Delay Amount:
+    <input type="number" id="delayAmount" min="0" placeholder="Enter delay amount" />
+  </label>
+
+  <label>
+    Delay Unit:
+    <select id="delayUnit">
+      <option value="seconds">Seconds</option>
+      <option value="minutes" selected>Minutes</option>
+      <option value="hours">Hours</option>
+    </select>
+  </label>
+
+  <label>
+    Slack Message:
+    <input type="text" id="slackMessage" placeholder="Enter Slack message" />
+  </label>
+
+  <label>
+    Slack Hook URL:
+    <input type="text" id="slackHookUrl" placeholder="Enter Slack webhook URL" />
+  </label>
+
+  <button id="sendButton" disabled>Send</button>
+</form>
+
+  <script>
+  const delayAmountInput = document.getElementById('delayAmount');
+  const delayUnitSelect = document.getElementById('delayUnit');
+  const slackMessageInput = document.getElementById('slackMessage');
+  const slackHookUrlInput = document.getElementById('slackHookUrl');
+  const sendButton = document.getElementById('sendButton');
+
+  function updateButtonState() {
+    const delayAmount = delayAmountInput.value;
+    const message = slackMessageInput.value.trim();
+    const url = slackHookUrlInput.value.trim();
+    
+    const allFilled = delayAmount && message && url;
+    sendButton.disabled = !allFilled;
+
+    if (delayAmount) {
+      sendButton.textContent = `Send in ${delayAmount} ${delayUnitSelect.value}`;
+    } else {
+      sendButton.textContent = 'Send';
+    }
+  }
+
+  function getDelayInMilliseconds(amount, unit) {
+    const num = parseFloat(amount);
+    switch (unit) {
+      case 'seconds': return num * 1000;
+      case 'minutes': return num * 60 * 1000;
+      case 'hours': return num * 60 * 60 * 1000;
+      default: return 0;
+    }
+  }
+
+  async function sendSlackMessage(url, message) {
+    var url=url;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify({ text: message })
+      });
+
+      if (response.ok) {
+        await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            webhookUrl: url,
+            message: message
+          })
+        });
+      } else {
+        alert('Failed to send message. Check the webhook URL and try again.');
+      }
+    } catch (error) {
+      alert('Error sending message: ' + error.message);
+    }
+  }
+
+  sendButton.addEventListener('click', () => {
+    const delay = getDelayInMilliseconds(delayAmountInput.value, delayUnitSelect.value);
+    const message = slackMessageInput.value.trim();
+    const url = slackHookUrlInput.value.trim();
+
+    sendButton.disabled = true;
+    sendButton.textContent = 'Scheduling...';
+
+    setTimeout(() => {
+      sendSlackMessage(url, message);
+      updateButtonState();
+    }, delay);
+  });
+
+  delayAmountInput.addEventListener('input', updateButtonState);
+  delayUnitSelect.addEventListener('change', updateButtonState);
+  slackMessageInput.addEventListener('input', updateButtonState);
+  slackHookUrlInput.addEventListener('input', updateButtonState);
+</script>
+
+</body>
+</html>
