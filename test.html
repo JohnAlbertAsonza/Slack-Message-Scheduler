@@ -128,7 +128,7 @@
 
   async function sendSlackMessage(webhookUrl, message) {
     try {
-     const response = await fetch('https://cors-anywhere.herokuapp.com/https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX', {
+     const response = await fetch('https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -136,7 +136,9 @@
   body: JSON.stringify({
     webhookUrl,
     message // Assuming `message` is the text you want to send to Slack
-  })
+  }),
+       mode: 'cors',  // This indicates you're making a CORS request
+  credentials: 'same-origin'  // Optional, only if you need credentials (cookies, etc.)
 });
 
       if (response.ok) {
