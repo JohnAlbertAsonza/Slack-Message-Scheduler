@@ -129,7 +129,7 @@
   async function sendSlackMessage(url, message) {
     var url=url;
     try {
-      const response = await ffetch('http://localhost:3000/send-slack', {
+      const response = await fetch('http://localhost:3000/send-slack', {
         method: 'POST',
         headers: {
           'Content-type': 'application/json'
