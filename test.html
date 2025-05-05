@@ -95,6 +95,15 @@
 </form>
 
   <script>
+    const express = require('express');
+const cors = require('cors');
+const fetch = require('node-fetch');  // or any HTTP client
+const app = express();
+const port = 3000;
+
+// Use CORS middleware to allow all origins
+app.use(cors());  // This allows cross-origin requests from any origin
+app.use(express.json());  // Parse JSON body in requests
   const delayAmountInput = document.getElementById('delayAmount');
   const delayUnitSelect = document.getElementById('delayUnit');
   const slackMessageInput = document.getElementById('slackMessage');
